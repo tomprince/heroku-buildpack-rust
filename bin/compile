@@ -33,9 +33,11 @@ fi
 mkdir -p "$2"
 cd "$2"
 
-mkdir -p rust-release-deps
-mkdir -p "$1/target/release"
-ln -nsf "$2/rust-release-deps" "$1/target/release/deps"
+rust_deps="$2/rust-release-deps"
+if [ -d "${rust_deps}" ]; then
+  mkdir -p "$1/target/release"
+  mv "${rust_deps}" "$1/target/release/deps"
+fi
 
 # Make sure we have the correct Rust binaries and set up PATH.
 rust_path="$2/rust-$VERSION/"
@@ -77,3 +79,5 @@ cd "$1"
 # To debug git issues:
 #export RUST_LOG="cargo::sources::git=debug"
 HOME="$cargo_home" cargo build --verbose --release
+
+mv "$1/target/release/deps" "${rust_deps}"
