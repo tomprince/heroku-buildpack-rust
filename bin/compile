@@ -33,6 +33,10 @@ fi
 mkdir -p "$2"
 cd "$2"
 
+mkdir -p rust-release-deps
+mkdir -p "$1/target/release"
+ln -nsf "$2/rust-release-deps" "$1/target/release/deps"
+
 # Make sure we have the correct Rust binaries and set up PATH.
 rust_path="$2/rust-$VERSION/"
 rust_tmp="$2/rust-tmp-$VERSION/"
