@@ -33,14 +33,15 @@ fi
 mkdir -p "$2"
 cd "$2"
 
+echo "-----> Extracting cache?"
 mkdir -p "$1/target/release"
 rust_deps="$2/rust-release-deps"
 if [ -d "${rust_deps}" ]; then
-  mv "${rust_deps}" "$1/target/release/deps"
+  mv -v "${rust_deps}" "$1/target/release/deps"
 fi
 rust_build="$2/rust-release-build"
 if [ -d "${rust_build}" ]; then
-  mv "${rust_build}" "$1/target/release/build"
+  mv -v "${rust_build}" "$1/target/release/build"
 fi
 
 # Make sure we have the correct Rust binaries and set up PATH.
@@ -84,5 +85,6 @@ cd "$1"
 #export RUST_LOG="cargo::sources::git=debug"
 HOME="$cargo_home" cargo build --verbose --release
 
-mv "$1/target/release/deps" "${rust_deps}"
-mv "$1/target/release/build" "${rust_build}"
+echo "-----> Saving cache?"
+mv -v "$1/target/release/deps" "${rust_deps}"
+mv -v "$1/target/release/build" "${rust_build}"
