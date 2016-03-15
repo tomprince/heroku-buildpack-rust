@@ -33,10 +33,14 @@ fi
 mkdir -p "$2"
 cd "$2"
 
+mkdir -p "$1/target/release"
 rust_deps="$2/rust-release-deps"
 if [ -d "${rust_deps}" ]; then
-  mkdir -p "$1/target/release"
   mv "${rust_deps}" "$1/target/release/deps"
+fi
+rust_build="$2/rust-release-build"
+if [ -d "${rust_build}" ]; then
+  mv "${rust_build}" "$1/target/release/build"
 fi
 
 # Make sure we have the correct Rust binaries and set up PATH.
@@ -81,3 +85,4 @@ cd "$1"
 HOME="$cargo_home" cargo build --verbose --release
 
 mv "$1/target/release/deps" "${rust_deps}"
+mv "$1/target/release/build" "${rust_build}"
