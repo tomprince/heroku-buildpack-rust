@@ -43,6 +43,10 @@ rust_build="$2/rust-release-build"
 if [ -d "${rust_build}" ]; then
   mv -v "${rust_build}" "$1/target/release/build"
 fi
+rust_fingerprint="$2/rust-release-fingerprint"
+if [ -d "${rust_fingerprint}" ]; then
+  mv -v "${rust_fingerprint}" "$1/target/release/.fingerprint"
+fi
 
 # Make sure we have the correct Rust binaries and set up PATH.
 rust_path="$2/rust-$VERSION/"
@@ -62,6 +66,9 @@ else
   tar xzf rust.tar.gz -C "${rust_tmp}"
   "$(ls -1d "${rust_tmp}"/*)/install.sh" --prefix="${rust_path}" --disable-ldconfig
   rm -r rust.tar.gz "${rust_tmp}"
+  for share_dir in doc man zsh; do
+    rm -r "${rust_path}/share/${share_dir}"
+  done
 fi
 if [ ! -x "$rust_path/bin/rustc" ]; then
     echo "failed: Cannot find Rust binaries at $rust_path/bin"
@@ -75,7 +82,7 @@ echo "$LD_LIBRARY_PATH"
 # Make sure we have a fake home directory for the Cargo cache.  Ideally
 # we would keep these in our cache, but our ".git" directories don't
 # survive between builds.
-cargo_home=$2
+export CARGO_HOME=$2/cargo
 
 # Build the actual application using Cargo.
 echo "-----> Building application using Cargo"
@@ -83,8 +90,9 @@ echo "-----> Building application using Cargo"
 cd "$1"
 # To debug git issues:
 #export RUST_LOG="cargo::sources::git=debug"
-HOME="$cargo_home" cargo build --verbose --release
+cargo build --verbose --release
 
 echo "-----> Saving cache?"
 mv -v "$1/target/release/deps" "${rust_deps}"
 mv -v "$1/target/release/build" "${rust_build}"
+mv -v "$1/target/release/.fingerprint" "${rust_fingerprint}"
